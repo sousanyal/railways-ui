@@ -57,3 +57,4 @@ src/test/robot/libs/__pycache__/
 src/test/robot/variables/__pycache__/
 
 .cache
+.vscode

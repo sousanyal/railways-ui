@@ -1,0 +1,352 @@
+[
+{
+ "DataId": "53214",
+ "DiagramId": "73",
+ "TypeId": "37",
+ "Regions": "A,271,200,40,60,0,90|L,280,255,280,230|L,280,230,312,230",
+ "RegionType": "E",
+ "Zindex": "1",
+ "ColorCode": "#f7a0b6",
+ "UnitLength": "1.100"
+},
+{
+ "DataId": "53215",
+ "DiagramId": "73",
+ "TypeId": "37",
+ "Regions": "L,30,255,30 ,255|A,2,200,40,60,90,90|L,2,230,31,230|L,31,230,31,255",
+ "RegionType": "E",
+ "Zindex": "1",
+ "ColorCode": "#f7a0b6",
+ "UnitLength": "1.100"
+},
+{
+ "DataId": "53217",
+ "DiagramId": "73",
+ "TypeId": "1",
+ "Regions": "28,223,255,30",
+ "RegionType": "R",
+ "Zindex": "1",
+ "ColorCode": "#e40429",
+ "UnitLength": "1.000"
+},
+{
+ "DataId": "53221",
+ "DiagramId": "73",
+ "TypeId": "51",
+ "Regions": "115,85,5,138",
+ "RegionType": "R",
+ "Zindex": "0",
+ "ColorCode": "#149e0a",
+ "UnitLength": "1.000"
+},
+{
+ "DataId": "53222",
+ "DiagramId": "73",
+ "TypeId": "51",
+ "Regions": "190,85,5,138",
+ "RegionType": "R",
+ "Zindex": "0",
+ "ColorCode": "#149e0a",
+ "UnitLength": "1.000"
+},
+{
+ "DataId": "53223",
+ "DiagramId": "73",
+ "TypeId": "51",
+ "Regions": "100,80,110,5",
+ "RegionType": "R",
+ "Zindex": "0",
+ "ColorCode": "#149e0a",
+ "UnitLength": "1.000"
+},
+{
+ "DataId": "53228",
+ "DiagramId": "73",
+ "TypeId": "53",
+ "Regions": "30,190,10,65",
+ "RegionType": "R",
+ "Zindex": "0",
+ "ColorCode": "#e953ee",
+ "UnitLength": "1.000"
+},
+{
+ "DataId": "53229",
+ "DiagramId": "73",
+ "TypeId": "53",
+ "Regions": "275,190,10,65",
+ "RegionType": "R",
+ "Zindex": "0",
+ "ColorCode": "#e953ee",
+ "UnitLength": "1.000"
+},
+{
+ "DataId": "53230",
+ "DiagramId": "73",
+ "TypeId": "53",
+ "Regions": "90,190,10,63",
+ "RegionType": "R",
+ "Zindex": "0",
+ "ColorCode": "#e953ee",
+ "UnitLength": "1.000"
+},
+{
+ "DataId": "53231",
+ "DiagramId": "73",
+ "TypeId": "53",
+ "Regions": "210,190,10,63",
+ "RegionType": "R",
+ "Zindex": "0",
+ "ColorCode": "#e953ee",
+ "UnitLength": "1.000"
+},
+{
+ "DataId": "53240",
+ "DiagramId": "73",
+ "TypeId": "52",
+ "Regions": "2,200,28,22",
+ "RegionType": "R",
+ "Zindex": "-1",
+ "ColorCode": "#68a9ec",
+ "UnitLength": "1.000"
+},
+{
+ "DataId": "53241",
+ "DiagramId": "73",
+ "TypeId": "52",
+ "Regions": "30,200,28,22",
+ "RegionType": "R",
+ "Zindex": "-1",
+ "ColorCode": "#68a9ec",
+ "UnitLength": "1.000"
+},
+{
+ "DataId": "53242",
+ "DiagramId": "73",
+ "TypeId": "52",
+ "Regions": "58,200,28,22",
+ "RegionType": "R",
+ "Zindex": "-1",
+ "ColorCode": "#68a9ec",
+ "UnitLength": "1.000"
+},
+{
+ "DataId": "53243",
+ "DiagramId": "73",
+ "TypeId": "52",
+ "Regions": "86,200,28,22",
+ "RegionType": "R",
+ "Zindex": "-1",
+ "ColorCode": "#68a9ec",
+ "UnitLength": "1.000"
+},
+{
+ "DataId": "53244",
+ "DiagramId": "73",
+ "TypeId": "52",
+ "Regions": "195,200,29,22",
+ "RegionType": "R",
+ "Zindex": "-1",
+ "ColorCode": "#68a9ec",
+ "UnitLength": "1.000"
+},
+{
+ "DataId": "53245",
+ "DiagramId": "73",
+ "TypeId": "52",
+ "Regions": "224,200,29,22",
+ "RegionType": "R",
+ "Zindex": "-1",
+ "ColorCode": "#68a9ec",
+ "UnitLength": "1.000"
+},
+{
+ "DataId": "53246",
+ "DiagramId": "73",
+ "TypeId": "52",
+ "Regions": "253,200,29,22",
+ "RegionType": "R",
+ "Zindex": "-1",
+ "ColorCode": "#68a9ec",
+ "UnitLength": "1.000"
+},
+{
+ "DataId": "53247",
+ "DiagramId": "73",
+ "TypeId": "52",
+ "Regions": "282,200,29,22",
+ "RegionType": "R",
+ "Zindex": "-1",
+ "ColorCode": "#68a9ec",
+ "UnitLength": "1.000"
+},
+{
+ "DataId": "53276",
+ "DiagramId": "73",
+ "TypeId": "52",
+ "Regions": "2,178,28,22",
+ "RegionType": "R",
+ "Zindex": "-1",
+ "ColorCode": "#68a9ec",
+ "UnitLength": "1.000"
+},
+{
+ "DataId": "53277",
+ "DiagramId": "73",
+ "TypeId": "52",
+ "Regions": "30,178,28,22",
+ "RegionType": "R",
+ "Zindex": "-1",
+ "ColorCode": "#68a9ec",
+ "UnitLength": "1.000"
+},
+{
+ "DataId": "53278",
+ "DiagramId": "73",
+ "TypeId": "52",
+ "Regions": "58,178,28,22",
+ "RegionType": "R",
+ "Zindex": "-1",
+ "ColorCode": "#68a9ec",
+ "UnitLength": "1.000"
+},
+{
+ "DataId": "53279",
+ "DiagramId": "73",
+ "TypeId": "52",
+ "Regions": "86,178,28,22",
+ "RegionType": "R",
+ "Zindex": "-1",
+ "ColorCode": "#68a9ec",
+ "UnitLength": "1.000"
+},
+{
+ "DataId": "53280",
+ "DiagramId": "73",
+ "TypeId": "52",
+ "Regions": "195,178,29,22",
+ "RegionType": "R",
+ "Zindex": "-1",
+ "ColorCode": "#68a9ec",
+ "UnitLength": "1.000"
+},
+{
+ "DataId": "53281",
+ "DiagramId": "73",
+ "TypeId": "52",
+ "Regions": "224,178,29,22",
+ "RegionType": "R",
+ "Zindex": "-1",
+ "ColorCode": "#68a9ec",
+ "UnitLength": "1.000"
+},
+{
+ "DataId": "53282",
+ "DiagramId": "73",
+ "TypeId": "52",
+ "Regions": "253,178,29,22",
+ "RegionType": "R",
+ "Zindex": "-1",
+ "ColorCode": "#68a9ec",
+ "UnitLength": "1.000"
+},
+{
+ "DataId": "53283",
+ "DiagramId": "73",
+ "TypeId": "52",
+ "Regions": "282,178,29,22",
+ "RegionType": "R",
+ "Zindex": "-1",
+ "ColorCode": "#68a9ec",
+ "UnitLength": "1.000"
+},
+{
+ "DataId": "53284",
+ "DiagramId": "73",
+ "TypeId": "52",
+ "Regions": "2,156,28,22",
+ "RegionType": "R",
+ "Zindex": "-1",
+ "ColorCode": "#68a9ec",
+ "UnitLength": "1.000"
+},
+{
+ "DataId": "53285",
+ "DiagramId": "73",
+ "TypeId": "52",
+ "Regions": "30,156,28,22",
+ "RegionType": "R",
+ "Zindex": "-1",
+ "ColorCode": "#68a9ec",
+ "UnitLength": "1.000"
+},
+{
+ "DataId": "53286",
+ "DiagramId": "73",
+ "TypeId": "52",
+ "Regions": "58,156,28,22",
+ "RegionType": "R",
+ "Zindex": "-1",
+ "ColorCode": "#68a9ec",
+ "UnitLength": "1.000"
+},
+{
+ "DataId": "53287",
+ "DiagramId": "73",
+ "TypeId": "52",
+ "Regions": "86,156,28,22",
+ "RegionType": "R",
+ "Zindex": "-1",
+ "ColorCode": "#68a9ec",
+ "UnitLength": "1.000"
+},
+{
+ "DataId": "53288",
+ "DiagramId": "73",
+ "TypeId": "52",
+ "Regions": "195,156,29,22",
+ "RegionType": "R",
+ "Zindex": "-1",
+ "ColorCode": "#68a9ec",
+ "UnitLength": "1.000"
+},
+{
+ "DataId": "53289",
+ "DiagramId": "73",
+ "TypeId": "52",
+ "Regions": "224,156,29,22",
+ "RegionType": "R",
+ "Zindex": "-1",
+ "ColorCode": "#68a9ec",
+ "UnitLength": "1.000"
+},
+{
+ "DataId": "53290",
+ "DiagramId": "73",
+ "TypeId": "52",
+ "Regions": "253,156,29,22",
+ "RegionType": "R",
+ "Zindex": "-1",
+ "ColorCode": "#68a9ec",
+ "UnitLength": "1.000"
+},
+{
+ "DataId": "53291",
+ "DiagramId": "73",
+ "TypeId": "52",
+ "Regions": "282,156,29,22",
+ "RegionType": "R",
+ "Zindex": "-1",
+ "ColorCode": "#68a9ec",
+ "UnitLength": "1.000"
+},
+{
+ "DataId": "73914",
+ "DiagramId": "73",
+ "TypeId": "87",
+ "Regions": "L,156,224,196,224|L,196,224,196,264|L,196,264,116,264|L,116,264,116,224|L,116,224,156,224|L,156,224,156,234|L,156,234,186,234|L,186,234,186,254|L,186,254,126,254|L,126,254,126,234|L,126,234,156,234",
+ "RegionType": "E",
+ "Zindex": "0",
+ "ColorCode": "#5F51A3",
+ "UnitLength": "1.000"
+}
+]
