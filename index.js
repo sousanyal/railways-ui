@@ -18883,6 +18883,7 @@ function draw() {
     var j = 0;
 
     for(var i = 0; i < detailResult.length; i++) {
+      if(detailResult[i].RegionType == "R") {
       var rectangleDimStr = detailResult[i].Regions;
       ctx.fillStyle = detailResult[i].ColorCode;
       var rectDim = detailResult[i].Regions.split(',');
@@ -18892,12 +18893,14 @@ function draw() {
       pathDetails.set(rectPath, new Map().set(rectDim, detailResult[i].ColorCode));
       //ctx.fillRect(rectDim[0], rectDim[1], rectDim[2], rectDim[3]);
       j++;
+      }
     }
 
     detailResult = JSON.parse(detailJson2);
     console.log(detailResult);
 
     for(var i = 0; i < detailResult.length; i++) {
+      if(detailResult[i].RegionType == "R") {
       var rectangleDimStr = detailResult[i].Regions;
       ctx.fillStyle = detailResult[i].ColorCode;
       var rectDim = detailResult[i].Regions.split(',');
@@ -18907,12 +18910,14 @@ function draw() {
       pathDetails.set(rectPath, new Map().set(rectDim, detailResult[i].ColorCode));
       //ctx.fillRect(rectDim[0], rectDim[1], rectDim[2], rectDim[3]);
       j++;
+      }
     }
 
     detailResult = JSON.parse(detailJson3);
     console.log(detailResult);
 
     for(var i = 0; i < detailResult.length; i++) {
+      if(detailResult[i].RegionType == "R") {
       var rectangleDimStr = detailResult[i].Regions;
       ctx.fillStyle = detailResult[i].ColorCode;
       var rectDim = detailResult[i].Regions.split(',');
@@ -18922,12 +18927,14 @@ function draw() {
       pathDetails.set(rectPath, new Map().set(rectDim, detailResult[i].ColorCode));
       //ctx.fillRect(rectDim[0], rectDim[1], rectDim[2], rectDim[3]);
       j++;
+      }
     }
 
     detailResult = JSON.parse(detailJson72);
     console.log(detailResult);
 
     for(var i = 0; i < detailResult.length; i++) {
+      if(detailResult[i].RegionType == "R") {
       var rectangleDimStr = detailResult[i].Regions;
       ctx.fillStyle = detailResult[i].ColorCode;
       var rectDim = detailResult[i].Regions.split(',');
@@ -18937,12 +18944,14 @@ function draw() {
       pathDetails.set(rectPath, new Map().set(rectDim, detailResult[i].ColorCode));
       //ctx.fillRect(rectDim[0], rectDim[1], rectDim[2], rectDim[3]);
       j++;
+      }
     }
 
     detailResult = JSON.parse(detailJson73);
     console.log(detailResult);
 
     for(var i = 0; i < detailResult.length; i++) {
+      if(detailResult[i].RegionType == "R") {
       var rectangleDimStr = detailResult[i].Regions;
       ctx.fillStyle = detailResult[i].ColorCode;
       var rectDim = detailResult[i].Regions.split(',');
@@ -18952,6 +18961,7 @@ function draw() {
       pathDetails.set(rectPath, new Map().set(rectDim, detailResult[i].ColorCode));
       //ctx.fillRect(rectDim[0], rectDim[1], rectDim[2], rectDim[3]);
       j++;
+      }
     }
     console.log(pathDetails);
   }
@@ -18964,6 +18974,7 @@ function printMousePos(event) {
   console.log("clientX: " + event.clientX + " - clientY: " + event.clientY);
   for (var i = 0; i < itemDetails.length; i++) { 
     if (ctx.isPointInPath(itemDetails[i].path, event.clientX, event.clientY)) {
+      console.log("inside path " + itemDetails[i].coordinates);
       ctx.fillStyle = itemDetails[i].colorcode;
       ctx.fillRect(itemDetails[i].coordinates[0], itemDetails[i].coordinates[1], 
         itemDetails[i].coordinates[2], itemDetails[i].coordinates[3]);
@@ -18972,16 +18983,18 @@ function printMousePos(event) {
     }
 
     if (ctx.isPointInPath(itemDetails[i].path, event.clientX, Number(event.clientY) - Number(300))) {
+      console.log("inside path " + itemDetails[i].coordinates);
       ctx.fillStyle = itemDetails[i].colorcode;
-      ctx.fillRect(itemDetails[i].coordinates[0], itemDetails[i].coordinates[1], 
+      ctx.fillRect(itemDetails[i].coordinates[0], Number(itemDetails[i].coordinates[1]) + Number(300), 
         itemDetails[i].coordinates[2], itemDetails[i].coordinates[3]);
       itemDetails[i].state = true;  
       break;
     }
 
     if (ctx.isPointInPath(itemDetails[i].path, event.clientX, Number(event.clientY) - Number(600))) {
+      console.log("inside path " + itemDetails[i].coordinates);
       ctx.fillStyle = itemDetails[i].colorcode;
-      ctx.fillRect(itemDetails[i].coordinates[0], itemDetails[i].coordinates[1], 
+      ctx.fillRect(itemDetails[i].coordinates[0], Number(itemDetails[i].coordinates[1]) + Number(600), 
         itemDetails[i].coordinates[2], itemDetails[i].coordinates[3]);
       itemDetails[i].state = true;    
       break;
@@ -18994,7 +19007,7 @@ document.addEventListener("click", printMousePos);
 function mouseMove(event){
   const canvas = document.getElementById("selection");
   const ctx = canvas.getContext("2d");
-  console.log("clientX: " + event.clientX + " - clientY: " +  event.clientY);
+  //console.log("clientX: " + event.clientX + " - clientY: " +  event.clientY);
 
   for (var i = 0; i < itemDetails.length; i++) { 
     if(ctx.isPointInPath(itemDetails[i].path, event.clientX, event.clientY)) {
@@ -19016,14 +19029,14 @@ function mouseMove(event){
 
     if(ctx.isPointInPath(itemDetails[i].path, event.clientX, Number(event.clientY) - Number(300))) {
       ctx.fillStyle = itemDetails[i].colorcode;
-      ctx.fillRect(itemDetails[i].coordinates[0], itemDetails[i].coordinates[1], 
+      ctx.fillRect(itemDetails[i].coordinates[0], Number(itemDetails[i].coordinates[1]) + Number(300), 
         itemDetails[i].coordinates[2], itemDetails[i].coordinates[3]);
       break;
     }
 
     if(ctx.isPointInPath(itemDetails[i].path, event.clientX, Number(event.clientY) - Number(600))) {
       ctx.fillStyle = itemDetails[i].colorcode;
-      ctx.fillRect(itemDetails[i].coordinates[0], itemDetails[i].coordinates[1], 
+      ctx.fillRect(itemDetails[i].coordinates[0], Number(itemDetails[i].coordinates[1]) + Number(600), 
         itemDetails[i].coordinates[2], itemDetails[i].coordinates[3]);
       break;
     }
