@@ -19007,38 +19007,57 @@ document.addEventListener("click", printMousePos);
 function mouseMove(event){
   const canvas = document.getElementById("selection");
   const ctx = canvas.getContext("2d");
-  //console.log("clientX: " + event.clientX + " - clientY: " +  event.clientY);
+  console.log("clientX: " + event.clientX + " - clientY: " +  event.clientY);
 
   for (var i = 0; i < itemDetails.length; i++) { 
     if(ctx.isPointInPath(itemDetails[i].path, event.clientX, event.clientY)) {
-        ctx.fillStyle = "rgba(228, 4, 41, 0.2)";
-        if(itemDetails[i].state != true && itemDetails[i].coordinates[0] == 962 && itemDetails[i].coordinates[1] == 11 
-          && itemDetails[i].coordinates[2] == 8 && itemDetails[i].coordinates[3] == 110) {
-          ctx.fillRect(itemDetails[i].coordinates[0], itemDetails[i].coordinates[1], 
-            itemDetails[i].coordinates[2], itemDetails[i].coordinates[3]);
+        if(itemDetails[i].state != true) {
+          ctx.fillStyle = "rgba(228, 4, 41, 0.2)";
+          ctx.fillRect(Number(itemDetails[i].coordinates[0]) + Number(3), Number(itemDetails[i].coordinates[1]) + Number(3), 
+          Number(itemDetails[i].coordinates[2]) - Number(5), Number(itemDetails[i].coordinates[3]) - Number(5));
         }
       break;
-    } else {
-      ctx.fillStyle = itemDetails[i].colorcode;
-      if(itemDetails[i].state != true && itemDetails[i].coordinates[0] == 962 && itemDetails[i].coordinates[1] == 11 
-        && itemDetails[i].coordinates[2] == 8 && itemDetails[i].coordinates[3] == 110) {
-        ctx.clearRect(itemDetails[i].coordinates[0], itemDetails[i].coordinates[1], 
-          itemDetails[i].coordinates[2], itemDetails[i].coordinates[3]);
+    } 
+    else {
+      if(itemDetails[i].state != true) {
+        ctx.clearRect(Number(itemDetails[i].coordinates[0]) + Number(3), Number(itemDetails[i].coordinates[1]) + Number(3), 
+          Number(itemDetails[i].coordinates[2]) - Number(5), Number(itemDetails[i].coordinates[3]) - Number(5));
+        ctx.fillStyle =  itemDetails[i].colorcode;
+        // ctx.strokeRect(itemDetails[i].coordinates[0], itemDetails[i].coordinates[1], 
+        //   itemDetails[i].coordinates[2], itemDetails[i].coordinates[3]);
       }
     }
 
     if(ctx.isPointInPath(itemDetails[i].path, event.clientX, Number(event.clientY) - Number(300))) {
-      ctx.fillStyle = itemDetails[i].colorcode;
-      ctx.fillRect(itemDetails[i].coordinates[0], Number(itemDetails[i].coordinates[1]) + Number(300), 
-        itemDetails[i].coordinates[2], itemDetails[i].coordinates[3]);
+      if(itemDetails[i].state != true) {
+        ctx.fillStyle = "rgba(228, 4, 41, 0.2)";
+        ctx.fillRect(Number(itemDetails[i].coordinates[0]) + Number(3), Number(itemDetails[i].coordinates[1]) + Number(300) + Number(3), 
+          Number(itemDetails[i].coordinates[2]) - Number(5), Number(itemDetails[i].coordinates[3]) - Number(5));
+      }
       break;
+    } 
+    else {
+      ctx.clearRect(Number(itemDetails[i].coordinates[0]) + Number(3), Number(itemDetails[i].coordinates[1]) + Number(300) + Number(3), 
+          Number(itemDetails[i].coordinates[2]) - Number(5), Number(itemDetails[i].coordinates[3]) - Number(5));
+      ctx.fillStyle =  itemDetails[i].colorcode;
+      // ctx.strokeRect(itemDetails[i].coordinates[0], Number(itemDetails[i].coordinates[1]) + Number(300), 
+      //   itemDetails[i].coordinates[2], itemDetails[i].coordinates[3]);
     }
 
     if(ctx.isPointInPath(itemDetails[i].path, event.clientX, Number(event.clientY) - Number(600))) {
-      ctx.fillStyle = itemDetails[i].colorcode;
-      ctx.fillRect(itemDetails[i].coordinates[0], Number(itemDetails[i].coordinates[1]) + Number(600), 
-        itemDetails[i].coordinates[2], itemDetails[i].coordinates[3]);
+      if(itemDetails[i].state != true) {
+        ctx.fillStyle = "rgba(228, 4, 41, 0.2)";
+        ctx.fillRect(Number(itemDetails[i].coordinates[0]) + Number(3), Number(itemDetails[i].coordinates[1]) + Number(600) + Number(3), 
+          Number(itemDetails[i].coordinates[2]) - Number(5), Number(itemDetails[i].coordinates[3]) - Number(5));
+      }
       break;
+    } 
+    else {
+      ctx.clearRect(Number(itemDetails[i].coordinates[0]) + Number(3), Number(itemDetails[i].coordinates[1]) + Number(600) + Number(3), 
+          Number(itemDetails[i].coordinates[2]) - Number(5), Number(itemDetails[i].coordinates[3]) - Number(5));
+      ctx.fillStyle =  itemDetails[i].colorcode;
+      // ctx.strokeRect(itemDetails[i].coordinates[0], Number(itemDetails[i].coordinates[1]) + Number(600), 
+      //   itemDetails[i].coordinates[2], itemDetails[i].coordinates[3]);
     }
 }
 }
