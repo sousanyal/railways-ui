@@ -1,4 +1,8 @@
-const csvParser = require('jquery-csv');
+import { Component, Renderer2 } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { ConfigHelperService } from './services/config-helper.service';
+import { map } from 'rxjs';
+
 const headerCsv = `DiagramId,CoachType,DiagramTypeId,DiagramTypeName,Name,TransCode,Lines,Rectangles,Eclipses,Circles,Paths
 1,0,1,"P","3 Door ICF Coah (GS)","GS","0,0,74,0|0,14,9,14|0,0,0,14|74,0,74,11|0,116,9,116|0,116,0,130|0,130,74,130|74,130,74,121|980,0,980,14|980,14,970,14|980,0,906,0|906,0,906,11|970,116,980,116|980,116,980,130|980,130,905,130|905,130,905,121|980,0,980,14|980,14,970,14|980,0,906,0|906,0,906,11|970,116,980,116|980,116,980,130|980,130,905,130|905,130,905,121|28,52,36,74|36,52,28,74|950,52,942,74|942,52,950,74|20,49,38,49|20,79,38,79|941,49,959,49|941,79,959,79|27,49,38,41|27,79,38,89|24,49,24,79|941,49,959,49|941,79,959,79|953,49,953,79|953,49,941,42|953,79,941,89|898,25,898,106|81,25,81,106","2,32,70,70|2,93,7,7|9,11,8,110|38,17,5,97|52,17,5,97|17,21,21,6|17,103,21,6|43,21,9,6|43,103,9,6|962,11,8,110|941,22,21,6|927,22,9,6|941,103,21,6|927,103,9,6|970,31,7,7|970,93,7,7|936,17,5,97|922,17,5,97|17,38,21,4|17,91,21,4|941,38,21,4|941,91,21,4|60,17,52,6|60,108,52,6|426,17,41,6|426,108,41,6|868,17,51,6|868,108,51,6|104,0,324,11|104,120,324,11|468,0,404,11|468,120,404,11|57,27,24,5|57,37,24,5|57,47,24,5|57,57,24,5|57,67,24,5|57,77,24,5|57,87,24,5|57,97,24,5|898,27,24,5|898,37,24,5|898,47,24,5|898,57,24,5|898,67,24,5|898,77,24,5|898,87,24,5|898,97,24,5|116,17,22,97|841,17,22,97|17,11,945,6|17,114,945,6","124,57,5,9|849,57,5,9|124,87,7,7|849,87,7,7|124,32,7,7|849,32,7,7",,
 2,0,1,"L","3 Door ICF Coah Left Side","GS","91,142,91,153|0,153,980,153|446,141,446,153|888,141,888,153|0,130,0,153|980,130,980,153|71,130,71,145|71,145,74,153|111,130,111,145|111,145,108,153|428,130,428,145|428,145,432,153|468,130,468,145|468,145,464,153|868,130,868,145|868,145,873,153|909,130,909,145|909,145,904,153","17,132,4,21|54,132,4,21|65,132,4,21|113,132,4,21|144,132,4,21|151,132,4,21|184,132,4,21|191,132,4,21|226,132,4,21|233,132,4,21|266,132,4,21|273,132,4,21|307,132,4,21|314,132,4,21|348,132,4,21|355,132,4,21|387,132,4,21|394,132,4,21|424,132,4,21|470,132,4,21|502,132,4,21|509,132,4,21|543,132,4,21|550,132,4,21|584,132,4,21|591,132,4,21|623,132,4,21|630,132,4,21|666,132,4,21|673,132,4,21|705,132,4,21|712,132,4,21|747,132,4,21|754,132,4,21|788,132,4,21|795,132,4,21|829,132,4,21|836,132,4,21|864,132,4,21|910,132,4,21|925,132,4,21|956,132,4,21|0,0,980,32|0,32,71,100|74,32,33,105|75,141,33,12|24,79,24,24|111,32,317,100|80,79,24,24|116,79,24,24|158,79,24,24|197,79,24,24|238,79,24,24|279,79,24,24|320,79,24,24|361,79,24,24|402,79,24,24|435,79,24,24|475,79,24,24|516,79,24,24|557,79,24,24|598,79,24,24|638,79,24,24|679,79,24,24|720,79,24,24|761,79,24,24|801,79,24,24|840,79,24,24|876,79,24,24|928,79,24,24|909,32,71,100|468,32,400,100|432,32,32,105|872,32,32,105|432,141,33,12|872,141,33,12",,,
@@ -18822,7 +18826,13 @@ var detailJson73 = `[
   ]`
 
 class ItemDetails {
-  constructor(path, coordinates, colorcode, state) {
+  dataId: number;
+  path: Path2D; // Add the 'path' property
+  coordinates: number[]; // Add the 'coordinates' property
+  colorcode: string;
+  state: boolean;
+  constructor(dataId: number, path: Path2D, coordinates: any[], colorcode: string, state: boolean) {
+    this.dataId = dataId;
     this.path = path;
     this.coordinates = coordinates;
     this.colorcode = colorcode;
@@ -18830,47 +18840,81 @@ class ItemDetails {
   }
 }
 
-var itemDetails = []
+var itemDetails: ItemDetails[] = [];
 
 var pathDetails = new Map();
 
-function draw() {
+function initialize(http: HttpClient, config: ConfigHelperService): (() => Promise<boolean>) {
+  return (): Promise<boolean> => {
+    return new Promise<boolean>((resolve: (a: boolean) => void): void => {
+       http.get<any>('./files/Diagram_header_TypeID_1.json') // Specify the type as 'any'
+         .pipe(
+           map((x: any) => { // Change the type to 'any'
+             config.diagramHeaders = x.diagramHeaders;
+             resolve(true);
+           })
+         ).subscribe();
+    });
+  };
+}
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
+})
+export class AppComponent {
+  title = 'coach-config';
+
+  constructor(private renderer2: Renderer2) {}
+
+  ngAfterViewInit() {
+    console.log("ngAfterViewInit");
+    window.addEventListener("load", this.draw);
+    this.renderer2.listen("document", "click", event => this.printMousePos(event));
+  }
+
+
+
+draw() {
   
   const canvas = document.getElementById("selection");
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
+  if (canvas) {
+    (canvas as HTMLCanvasElement).width = window.innerWidth;
+    (canvas as HTMLCanvasElement).height = window.innerHeight;
+  }
 
-  if (canvas.getContext) {
+  if ((canvas as HTMLCanvasElement).getContext) {
     //var headerResult = csvParser.toObjects(headerCsv);
     var headerResult = JSON.parse(headerJson);
     console.log(headerResult);
     console.log("---" + headerResult.length)
-    const ctx = canvas.getContext("2d");
+    const ctx = (canvas as HTMLCanvasElement)?.getContext("2d");
     var yOffset = 0;
     for(var i = 0; i < headerResult.length; i++) {    
       var lineDimStr = headerResult[i].Lines.split('|');
-      console.log(lineDimStr);
+      console.log("lineDimStr -- " + lineDimStr);
       for(var j = 0; j < lineDimStr.length; j++) {
         var lineDim = lineDimStr[j].split(',');
-        ctx.beginPath();
+        ctx?.beginPath();
         console.log(Number(lineDim[1]) + Number(yOffset));
-        ctx.moveTo(lineDim[0], Number(lineDim[1]) + Number(yOffset));
-        ctx.lineTo(lineDim[2], Number(lineDim[3]) + Number(yOffset));
-        ctx.stroke();
+        ctx?.moveTo(lineDim[0], Number(lineDim[1]) + Number(yOffset));
+        ctx?.lineTo(lineDim[2], Number(lineDim[3]) + Number(yOffset));
+        ctx?.stroke();
       }
 
       var rectangleDimStr = headerResult[i].Rectangles.split('|');
       for(var j = 0; j < rectangleDimStr.length; j++) {
-        var rectDim = rectangleDimStr[j].split(',');
-        ctx.strokeRect(rectDim[0], Number(rectDim[1]) + Number(yOffset), rectDim[2], rectDim[3]);
+        var rectDim = rectangleDimStr[j].split(',') as number[];
+        ctx?.strokeRect(rectDim[0], Number(rectDim[1]) + Number(yOffset), rectDim[2], rectDim[3]);
       }
 
       var ellipseDimStr = headerResult[i].Eclipses.split('|');
       for(var j = 0; j < ellipseDimStr.length; j++) {
         var ellipseDim = ellipseDimStr[j].split(',');
-        ctx.beginPath();
-        ctx.ellipse(ellipseDim[0], Number(ellipseDim[1]) + Number(yOffset), ellipseDim[2], ellipseDim[3], Math.PI / 4, 0, 2 * Math.PI);
-        ctx.stroke();
+        ctx?.beginPath();
+        ctx?.ellipse(ellipseDim[0], Number(ellipseDim[1]) + Number(yOffset), ellipseDim[2], ellipseDim[3], Math.PI / 4, 0, 2 * Math.PI);
+        ctx?.stroke();
       }
 
       yOffset += 300;
@@ -18884,15 +18928,17 @@ function draw() {
 
     for(var i = 0; i < detailResult.length; i++) {
       if(detailResult[i].RegionType == "R") {
-      var rectangleDimStr = detailResult[i].Regions;
-      ctx.fillStyle = detailResult[i].ColorCode;
-      var rectDim = detailResult[i].Regions.split(',');
-      var rectPath = new Path2D();
-      rectPath.rect(rectDim[0], rectDim[1], rectDim[2], rectDim[3]);
-      itemDetails[j] = new ItemDetails(rectPath, rectDim, detailResult[i].ColorCode, false);
-      pathDetails.set(rectPath, new Map().set(rectDim, detailResult[i].ColorCode));
-      //ctx.fillRect(rectDim[0], rectDim[1], rectDim[2], rectDim[3]);
-      j++;
+        var rectangleDimStr = detailResult[i].Regions;
+        if (ctx) {
+          ctx.fillStyle = detailResult[i].ColorCode;
+        }
+        var rectDim: number[] = detailResult[i].Regions.split(',').map(Number) as number[];
+        var rectPath = new Path2D();
+        rectPath.rect(rectDim[0], rectDim[1], rectDim[2], rectDim[3]);
+        itemDetails[j] = new ItemDetails(detailResult[i].dataId, rectPath, rectDim, detailResult[i].ColorCode, false);
+        pathDetails.set(rectPath, new Map().set(rectDim, detailResult[i].ColorCode));
+        //ctx.fillRect(rectDim[0], rectDim[1], rectDim[2], rectDim[3]);
+        j++;
       }
     }
 
@@ -18901,15 +18947,17 @@ function draw() {
 
     for(var i = 0; i < detailResult.length; i++) {
       if(detailResult[i].RegionType == "R") {
-      var rectangleDimStr = detailResult[i].Regions;
-      ctx.fillStyle = detailResult[i].ColorCode;
-      var rectDim = detailResult[i].Regions.split(',');
-      var rectPath = new Path2D();
-      rectPath.rect(rectDim[0], rectDim[1], rectDim[2], rectDim[3]);
-      itemDetails[j] = new ItemDetails(rectPath, rectDim, detailResult[i].ColorCode, false);
-      pathDetails.set(rectPath, new Map().set(rectDim, detailResult[i].ColorCode));
-      //ctx.fillRect(rectDim[0], rectDim[1], rectDim[2], rectDim[3]);
-      j++;
+        var rectangleDimStr = detailResult[i].Regions;
+        if (ctx) {
+          ctx.fillStyle = detailResult[i].ColorCode;
+        }
+        var rectDim = detailResult[i].Regions.split(',').map(Number) as number[];
+        var rectPath = new Path2D();
+        rectPath.rect(rectDim[0], rectDim[1], rectDim[2], rectDim[3]);
+        itemDetails[j] = new ItemDetails(detailResult[i].dataId, rectPath, rectDim, detailResult[i].ColorCode, false);
+        pathDetails.set(rectPath, new Map().set(rectDim, detailResult[i].ColorCode));
+        //ctx.fillRect(rectDim[0], rectDim[1], rectDim[2], rectDim[3]);
+        j++;
       }
     }
 
@@ -18918,15 +18966,17 @@ function draw() {
 
     for(var i = 0; i < detailResult.length; i++) {
       if(detailResult[i].RegionType == "R") {
-      var rectangleDimStr = detailResult[i].Regions;
-      ctx.fillStyle = detailResult[i].ColorCode;
-      var rectDim = detailResult[i].Regions.split(',');
-      var rectPath = new Path2D();
-      rectPath.rect(rectDim[0], rectDim[1], rectDim[2], rectDim[3]);
-      itemDetails[j] = new ItemDetails(rectPath, rectDim, detailResult[i].ColorCode, false);
-      pathDetails.set(rectPath, new Map().set(rectDim, detailResult[i].ColorCode));
-      //ctx.fillRect(rectDim[0], rectDim[1], rectDim[2], rectDim[3]);
-      j++;
+        var rectangleDimStr = detailResult[i].Regions;
+        if (ctx) {
+          ctx.fillStyle = detailResult[i].ColorCode;
+        }
+        var rectDim = detailResult[i].Regions.split(',').map(Number) as number[];
+        var rectPath = new Path2D();
+        rectPath.rect(rectDim[0], rectDim[1], rectDim[2], rectDim[3]);
+        itemDetails[j] = new ItemDetails(detailResult[i].dataId, rectPath, rectDim, detailResult[i].ColorCode, false);
+        pathDetails.set(rectPath, new Map().set(rectDim, detailResult[i].ColorCode));
+        //ctx.fillRect(rectDim[0], rectDim[1], rectDim[2], rectDim[3]);
+        j++;
       }
     }
 
@@ -18935,15 +18985,17 @@ function draw() {
 
     for(var i = 0; i < detailResult.length; i++) {
       if(detailResult[i].RegionType == "R") {
-      var rectangleDimStr = detailResult[i].Regions;
-      ctx.fillStyle = detailResult[i].ColorCode;
-      var rectDim = detailResult[i].Regions.split(',');
-      var rectPath = new Path2D();
-      rectPath.rect(rectDim[0], rectDim[1], rectDim[2], rectDim[3]);
-      itemDetails[j] = new ItemDetails(rectPath, rectDim, detailResult[i].ColorCode, false);
-      pathDetails.set(rectPath, new Map().set(rectDim, detailResult[i].ColorCode));
-      //ctx.fillRect(rectDim[0], rectDim[1], rectDim[2], rectDim[3]);
-      j++;
+        var rectangleDimStr = detailResult[i].Regions;
+        if (ctx) {
+          ctx.fillStyle = detailResult[i].ColorCode;
+        }
+        var rectDim = detailResult[i].Regions.split(',').map(Number) as number[];
+        var rectPath = new Path2D();
+        rectPath.rect(rectDim[0], rectDim[1], rectDim[2], rectDim[3]);
+        itemDetails[j] = new ItemDetails(detailResult[i].dataId, rectPath, rectDim, detailResult[i].ColorCode, false);
+        pathDetails.set(rectPath, new Map().set(rectDim, detailResult[i].ColorCode));
+        //ctx.fillRect(rectDim[0], rectDim[1], rectDim[2], rectDim[3]);
+        j++;
       }
     }
 
@@ -18952,49 +19004,58 @@ function draw() {
 
     for(var i = 0; i < detailResult.length; i++) {
       if(detailResult[i].RegionType == "R") {
-      var rectangleDimStr = detailResult[i].Regions;
-      ctx.fillStyle = detailResult[i].ColorCode;
-      var rectDim = detailResult[i].Regions.split(',');
-      var rectPath = new Path2D();
-      rectPath.rect(rectDim[0], rectDim[1], rectDim[2], rectDim[3]);
-      itemDetails[j] = new ItemDetails(rectPath, rectDim, detailResult[i].ColorCode, false);
-      pathDetails.set(rectPath, new Map().set(rectDim, detailResult[i].ColorCode));
-      //ctx.fillRect(rectDim[0], rectDim[1], rectDim[2], rectDim[3]);
-      j++;
+        var rectangleDimStr = detailResult[i].Regions;
+        if (ctx) {
+          ctx.fillStyle = detailResult[i].ColorCode;
+        }
+        var rectDim = detailResult[i].Regions.split(',').map(Number) as number[];
+        var rectPath = new Path2D();
+        rectPath.rect(rectDim[0], rectDim[1], rectDim[2], rectDim[3]);
+        itemDetails[j] = new ItemDetails(detailResult[i].dataId, rectPath, rectDim, detailResult[i].ColorCode, false);
+        pathDetails.set(rectPath, new Map().set(rectDim, detailResult[i].ColorCode));
+        //ctx.fillRect(rectDim[0], rectDim[1], rectDim[2], rectDim[3]);
+        j++;
       }
     }
     console.log(pathDetails);
   }
 }
-window.addEventListener("load", draw);
 
-function printMousePos(event) {
-  const canvas = document.getElementById("selection");
+printMousePos(event: MouseEvent) {
+  const canvas = document.getElementById("selection") as HTMLCanvasElement;
   const ctx = canvas.getContext("2d");
   console.log("clientX: " + event.clientX + " - clientY: " + event.clientY);
+  console.log("itemDetails[i].path: " + itemDetails[0].path);
   for (var i = 0; i < itemDetails.length; i++) { 
-    if (ctx.isPointInPath(itemDetails[i].path, event.clientX, event.clientY)) {
+    if (ctx?.isPointInPath(itemDetails[i].path, event.clientX, event.clientY)) {
+      console.log("inside path " + itemDetails[i].coordinates);
+      if(itemDetails[i].state !== true) {
+        ctx.fillStyle = itemDetails[i].colorcode;
+        ctx?.fillRect(itemDetails[i].coordinates[0], itemDetails[i].coordinates[1], 
+          itemDetails[i].coordinates[2], itemDetails[i].coordinates[3]);
+        itemDetails[i].state = true;  
+        break;
+      } else { 
+        ctx?.clearRect(itemDetails[i].coordinates[0], itemDetails[i].coordinates[1], 
+          itemDetails[i].coordinates[2], itemDetails[i].coordinates[3]);
+        itemDetails[i].state = false;
+        this.draw();
+      }
+    }
+
+    if (ctx?.isPointInPath(itemDetails[i].path, event.clientX, Number(event.clientY) - Number(300))) {
       console.log("inside path " + itemDetails[i].coordinates);
       ctx.fillStyle = itemDetails[i].colorcode;
-      ctx.fillRect(itemDetails[i].coordinates[0], itemDetails[i].coordinates[1], 
+      ctx.fillRect(itemDetails[i].coordinates[0], itemDetails[i].coordinates[1] + 300, 
         itemDetails[i].coordinates[2], itemDetails[i].coordinates[3]);
       itemDetails[i].state = true;  
       break;
     }
 
-    if (ctx.isPointInPath(itemDetails[i].path, event.clientX, Number(event.clientY) - Number(300))) {
+    if (ctx?.isPointInPath(itemDetails[i].path, event.clientX, Number(event.clientY) - Number(600))) {
       console.log("inside path " + itemDetails[i].coordinates);
       ctx.fillStyle = itemDetails[i].colorcode;
-      ctx.fillRect(itemDetails[i].coordinates[0], Number(itemDetails[i].coordinates[1]) + Number(300), 
-        itemDetails[i].coordinates[2], itemDetails[i].coordinates[3]);
-      itemDetails[i].state = true;  
-      break;
-    }
-
-    if (ctx.isPointInPath(itemDetails[i].path, event.clientX, Number(event.clientY) - Number(600))) {
-      console.log("inside path " + itemDetails[i].coordinates);
-      ctx.fillStyle = itemDetails[i].colorcode;
-      ctx.fillRect(itemDetails[i].coordinates[0], Number(itemDetails[i].coordinates[1]) + Number(600), 
+      ctx.fillRect(itemDetails[i].coordinates[0], itemDetails[i].coordinates[1] + 600, 
         itemDetails[i].coordinates[2], itemDetails[i].coordinates[3]);
       itemDetails[i].state = true;    
       break;
@@ -19002,64 +19063,66 @@ function printMousePos(event) {
   }
 }
 
-document.addEventListener("click", printMousePos);
-
-function mouseMove(event){
-  const canvas = document.getElementById("selection");
-  const ctx = canvas.getContext("2d");
+mouseMove(event: MouseEvent){
+  const canvas = document.getElementById("selection") as HTMLCanvasElement;
+  const ctx = canvas?.getContext("2d");
   console.log("clientX: " + event.clientX + " - clientY: " +  event.clientY);
 
   for (var i = 0; i < itemDetails.length; i++) { 
-    if(ctx.isPointInPath(itemDetails[i].path, event.clientX, event.clientY)) {
+    if(ctx?.isPointInPath(itemDetails[i].path, event.clientX, event.clientY)) {
         if(itemDetails[i].state != true) {
           ctx.fillStyle = "rgba(228, 4, 41, 0.2)";
-          ctx.fillRect(Number(itemDetails[i].coordinates[0]) + Number(3), Number(itemDetails[i].coordinates[1]) + Number(3), 
-          Number(itemDetails[i].coordinates[2]) - Number(5), Number(itemDetails[i].coordinates[3]) - Number(5));
+          ctx.fillRect(itemDetails[i].coordinates[0] + 1, itemDetails[i].coordinates[1] + 1, 
+          itemDetails[i].coordinates[2] - 5, itemDetails[i].coordinates[3] - 5);
         }
       break;
     } 
     else {
-      if(itemDetails[i].state != true) {
-        ctx.clearRect(Number(itemDetails[i].coordinates[0]) + Number(3), Number(itemDetails[i].coordinates[1]) + Number(3), 
-          Number(itemDetails[i].coordinates[2]) - Number(5), Number(itemDetails[i].coordinates[3]) - Number(5));
+      if (ctx && itemDetails[i].state != true) {
+        ctx.clearRect(itemDetails[i].coordinates[0] + 1, itemDetails[i].coordinates[1] + 1, 
+          itemDetails[i].coordinates[2] - 5, itemDetails[i].coordinates[3] - 5);
         ctx.fillStyle =  itemDetails[i].colorcode;
         // ctx.strokeRect(itemDetails[i].coordinates[0], itemDetails[i].coordinates[1], 
         //   itemDetails[i].coordinates[2], itemDetails[i].coordinates[3]);
       }
     }
 
-    if(ctx.isPointInPath(itemDetails[i].path, event.clientX, Number(event.clientY) - Number(300))) {
-      if(itemDetails[i].state != true) {
-        ctx.fillStyle = "rgba(228, 4, 41, 0.2)";
-        ctx.fillRect(Number(itemDetails[i].coordinates[0]) + Number(3), Number(itemDetails[i].coordinates[1]) + Number(300) + Number(3), 
-          Number(itemDetails[i].coordinates[2]) - Number(5), Number(itemDetails[i].coordinates[3]) - Number(5));
+    if (ctx) {
+      if (ctx.isPointInPath(itemDetails[i].path, event.clientX, Number(event.clientY) - Number(300))) {
+        if ((itemDetails[i] as ItemDetails).state != true) {
+          ctx.fillStyle = "rgba(228, 4, 41, 0.2)";
+          ctx.fillRect(itemDetails[i].coordinates[0] + 1, itemDetails[i].coordinates[1] + 300 + 1,
+            itemDetails[i].coordinates[2] - 5, itemDetails[i].coordinates[3] - 5);
+        }
+        break;
+      } else {
+        ctx.clearRect(itemDetails[i].coordinates[0] + 1, itemDetails[i].coordinates[1] + 300 + 1,
+          itemDetails[i].coordinates[2] - 5, itemDetails[i].coordinates[3] - 5);
+        ctx.fillStyle = (itemDetails[i] as ItemDetails).colorcode;
+        // ctx.strokeRect(itemDetails[i].coordinates[0], Number(itemDetails[i].coordinates[1]) + Number(300),
+        //   itemDetails[i].coordinates[2], itemDetails[i].coordinates[3]);
       }
-      break;
-    } 
-    else {
-      ctx.clearRect(Number(itemDetails[i].coordinates[0]) + Number(3), Number(itemDetails[i].coordinates[1]) + Number(300) + Number(3), 
-          Number(itemDetails[i].coordinates[2]) - Number(5), Number(itemDetails[i].coordinates[3]) - Number(5));
-      ctx.fillStyle =  itemDetails[i].colorcode;
-      // ctx.strokeRect(itemDetails[i].coordinates[0], Number(itemDetails[i].coordinates[1]) + Number(300), 
-      //   itemDetails[i].coordinates[2], itemDetails[i].coordinates[3]);
     }
 
-    if(ctx.isPointInPath(itemDetails[i].path, event.clientX, Number(event.clientY) - Number(600))) {
-      if(itemDetails[i].state != true) {
-        ctx.fillStyle = "rgba(228, 4, 41, 0.2)";
-        ctx.fillRect(Number(itemDetails[i].coordinates[0]) + Number(3), Number(itemDetails[i].coordinates[1]) + Number(600) + Number(3), 
-          Number(itemDetails[i].coordinates[2]) - Number(5), Number(itemDetails[i].coordinates[3]) - Number(5));
+    if (ctx) {
+      if (ctx.isPointInPath((itemDetails[i] as ItemDetails).path, event.clientX, Number(event.clientY) - Number(600))) {
+        if ((itemDetails[i] as ItemDetails).state != true) {
+          ctx.fillStyle = "rgba(228, 4, 41, 0.2)";
+          ctx.fillRect(itemDetails[i].coordinates[0] + 1, itemDetails[i].coordinates[1] + 600 + 1,
+            itemDetails[i].coordinates[2] - 5, itemDetails[i].coordinates[3] - 5);
+        }
+        break;
+      } else {
+        ctx.clearRect(itemDetails[i].coordinates[0] + 1, itemDetails[i].coordinates[1] + 600 + 1,
+          itemDetails[i].coordinates[2] - 5, itemDetails[i].coordinates[3] - 5);
+        ctx.fillStyle = itemDetails[i].colorcode;
+        // ctx.strokeRect(itemDetails[i].coordinates[0], Number(itemDetails[i].coordinates[1]) + Number(600),
+        //   itemDetails[i].coordinates[2], itemDetails[i].coordinates[3]);
       }
-      break;
-    } 
-    else {
-      ctx.clearRect(Number(itemDetails[i].coordinates[0]) + Number(3), Number(itemDetails[i].coordinates[1]) + Number(600) + Number(3), 
-          Number(itemDetails[i].coordinates[2]) - Number(5), Number(itemDetails[i].coordinates[3]) - Number(5));
-      ctx.fillStyle =  itemDetails[i].colorcode;
-      // ctx.strokeRect(itemDetails[i].coordinates[0], Number(itemDetails[i].coordinates[1]) + Number(600), 
-      //   itemDetails[i].coordinates[2], itemDetails[i].coordinates[3]);
     }
 }
 }
 
-document.addEventListener("mousemove", mouseMove);
+//document.getElementById("selection").addEventListener("mousemove", mouseMove);
+}
+
