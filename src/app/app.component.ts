@@ -1651,7 +1651,7 @@ const detailCsv = `DataId,DiagramId,TypeId,Regions,RegionType,Zindex,ColorCode,U
 50061,3,61,"850,120,15,12","R",-1,"#82418B",0.500`;
 
 
-var headerJson = `[
+const headerJson = `[
   {
    "DiagramId": "1",
    "CoachType": "0",
@@ -1719,7 +1719,7 @@ var headerJson = `[
   }
   ]`
 
-var detailJson1 = `[
+const detailJson1 = `[
   {
     "DataId": "1",
     "DiagramId": "1",
@@ -11152,7 +11152,7 @@ var detailJson1 = `[
   }
   ]`
 
-var detailJson2 = `[
+const detailJson2 = `[
   {
    "DataId": "1427",
    "DiagramId": "2",
@@ -14636,7 +14636,7 @@ var detailJson2 = `[
   ]
   `  
 
-var detailJson3 = `[
+const detailJson3 = `[
   {
    "DataId": "1469",
    "DiagramId": "3",
@@ -18119,7 +18119,7 @@ var detailJson3 = `[
   }
   ]`  
 
-var detailJson72 = `[
+const detailJson72 = `[
   {
    "DataId": "53212",
    "DiagramId": "72",
@@ -18472,7 +18472,7 @@ var detailJson72 = `[
   }
   ]`
 
-var detailJson73 = `[
+const detailJson73 = `[
   {
    "DataId": "53214",
    "DiagramId": "73",
@@ -18827,12 +18827,14 @@ var detailJson73 = `[
 
 class ItemDetails {
   dataId: number;
+  zIndex: number;
   path: Path2D; // Add the 'path' property
   coordinates: number[]; // Add the 'coordinates' property
   colorcode: string;
   state: boolean;
-  constructor(dataId: number, path: Path2D, coordinates: any[], colorcode: string, state: boolean) {
+  constructor(dataId: number, zIndex: number, path: Path2D, coordinates: any[], colorcode: string, state: boolean) {
     this.dataId = dataId;
+    this.zIndex = zIndex;
     this.path = path;
     this.coordinates = coordinates;
     this.colorcode = colorcode;
@@ -18840,9 +18842,9 @@ class ItemDetails {
   }
 }
 
-var itemDetails: ItemDetails[] = [];
+const itemDetails: ItemDetails[] = [];
 
-var pathDetails = new Map();
+const pathDetails = new Map();
 
 function initialize(http: HttpClient, config: ConfigHelperService): (() => Promise<boolean>) {
   return (): Promise<boolean> => {
@@ -18885,57 +18887,54 @@ draw() {
   }
 
   if ((canvas as HTMLCanvasElement).getContext) {
-    //var headerResult = csvParser.toObjects(headerCsv);
-    var headerResult = JSON.parse(headerJson);
-    console.log(headerResult);
-    console.log("---" + headerResult.length)
+    //let headerResult = csvParser.toObjects(headerCsv);
+    const headerResult = JSON.parse(headerJson);
     const ctx = (canvas as HTMLCanvasElement)?.getContext("2d");
-    var yOffset = 0;
-    for(var i = 0; i < headerResult.length; i++) {    
-      var lineDimStr = headerResult[i].Lines.split('|');
-      console.log("lineDimStr -- " + lineDimStr);
-      for(var j = 0; j < lineDimStr.length; j++) {
-        var lineDim = lineDimStr[j].split(',');
+    let yOffset = 0;
+    for(let i = 0; i < headerResult.length; i++) {    
+      const lineDimStr = headerResult[i].Lines.split('|');
+      for(let j = 0; j < lineDimStr.length; j++) {
+        const lineDim = lineDimStr[j].split(',').map(Number) as number[];
         ctx?.beginPath();
-        console.log(Number(lineDim[1]) + Number(yOffset));
-        ctx?.moveTo(lineDim[0], Number(lineDim[1]) + Number(yOffset));
-        ctx?.lineTo(lineDim[2], Number(lineDim[3]) + Number(yOffset));
+        console.log(lineDim[1] + yOffset);
+        ctx?.moveTo(lineDim[0], lineDim[1] + yOffset);
+        ctx?.lineTo(lineDim[2], lineDim[3] + yOffset);
         ctx?.stroke();
       }
 
-      var rectangleDimStr = headerResult[i].Rectangles.split('|');
-      for(var j = 0; j < rectangleDimStr.length; j++) {
-        var rectDim = rectangleDimStr[j].split(',') as number[];
-        ctx?.strokeRect(rectDim[0], Number(rectDim[1]) + Number(yOffset), rectDim[2], rectDim[3]);
+      const rectangleDimStr = headerResult[i].Rectangles.split('|');
+      for(let j = 0; j < rectangleDimStr.length; j++) {
+        const rectDim = rectangleDimStr[j].split(',').map(Number) as number[];
+        ctx?.strokeRect(rectDim[0], rectDim[1] + yOffset, rectDim[2], rectDim[3]);
       }
 
-      var ellipseDimStr = headerResult[i].Eclipses.split('|');
-      for(var j = 0; j < ellipseDimStr.length; j++) {
-        var ellipseDim = ellipseDimStr[j].split(',');
+      const ellipseDimStr = headerResult[i].Eclipses.split('|');
+      for(let j = 0; j < ellipseDimStr.length; j++) {
+        const ellipseDim = ellipseDimStr[j].split(',').map(Number) as number[];
         ctx?.beginPath();
-        ctx?.ellipse(ellipseDim[0], Number(ellipseDim[1]) + Number(yOffset), ellipseDim[2], ellipseDim[3], Math.PI / 4, 0, 2 * Math.PI);
+        ctx?.ellipse(ellipseDim[0], ellipseDim[1] + yOffset, ellipseDim[2], ellipseDim[3], Math.PI / 4, 0, 2 * Math.PI);
         ctx?.stroke();
       }
 
       yOffset += 300;
     }
 
-    //var detailResult = csvParser.toObjects(detailCsv);
-    var detailResult = JSON.parse(detailJson1);
+    //let detailResult = csvParser.toObjects(detailCsv);
+    let detailResult = JSON.parse(detailJson1);
     console.log(detailResult);
 
-    var j = 0;
+    let j = 0;
 
-    for(var i = 0; i < detailResult.length; i++) {
+    for(let i = 0; i < detailResult.length; i++) {
       if(detailResult[i].RegionType == "R") {
-        var rectangleDimStr = detailResult[i].Regions;
+        const rectangleDimStr = detailResult[i].Regions;
         if (ctx) {
           ctx.fillStyle = detailResult[i].ColorCode;
         }
-        var rectDim: number[] = detailResult[i].Regions.split(',').map(Number) as number[];
-        var rectPath = new Path2D();
+        const rectDim: number[] = detailResult[i].Regions.split(',').map(Number) as number[];
+        const rectPath = new Path2D();
         rectPath.rect(rectDim[0], rectDim[1], rectDim[2], rectDim[3]);
-        itemDetails[j] = new ItemDetails(detailResult[i].dataId, rectPath, rectDim, detailResult[i].ColorCode, false);
+        itemDetails[j] = new ItemDetails(detailResult[i].dataId, detailResult[i].Zindex, rectPath, rectDim, detailResult[i].ColorCode, false);
         pathDetails.set(rectPath, new Map().set(rectDim, detailResult[i].ColorCode));
         //ctx.fillRect(rectDim[0], rectDim[1], rectDim[2], rectDim[3]);
         j++;
@@ -18945,16 +18944,16 @@ draw() {
     detailResult = JSON.parse(detailJson2);
     console.log(detailResult);
 
-    for(var i = 0; i < detailResult.length; i++) {
+    for(let i = 0; i < detailResult.length; i++) {
       if(detailResult[i].RegionType == "R") {
-        var rectangleDimStr = detailResult[i].Regions;
+        const rectangleDimStr = detailResult[i].Regions;
         if (ctx) {
           ctx.fillStyle = detailResult[i].ColorCode;
         }
-        var rectDim = detailResult[i].Regions.split(',').map(Number) as number[];
-        var rectPath = new Path2D();
+        const rectDim = detailResult[i].Regions.split(',').map(Number) as number[];
+        const rectPath = new Path2D();
         rectPath.rect(rectDim[0], rectDim[1], rectDim[2], rectDim[3]);
-        itemDetails[j] = new ItemDetails(detailResult[i].dataId, rectPath, rectDim, detailResult[i].ColorCode, false);
+        itemDetails[j] = new ItemDetails(detailResult[i].dataId, detailResult[i].Zindex, rectPath, rectDim, detailResult[i].ColorCode, false);
         pathDetails.set(rectPath, new Map().set(rectDim, detailResult[i].ColorCode));
         //ctx.fillRect(rectDim[0], rectDim[1], rectDim[2], rectDim[3]);
         j++;
@@ -18964,16 +18963,16 @@ draw() {
     detailResult = JSON.parse(detailJson3);
     console.log(detailResult);
 
-    for(var i = 0; i < detailResult.length; i++) {
+    for(let i = 0; i < detailResult.length; i++) {
       if(detailResult[i].RegionType == "R") {
-        var rectangleDimStr = detailResult[i].Regions;
+        const rectangleDimStr = detailResult[i].Regions;
         if (ctx) {
           ctx.fillStyle = detailResult[i].ColorCode;
         }
-        var rectDim = detailResult[i].Regions.split(',').map(Number) as number[];
-        var rectPath = new Path2D();
+        const rectDim = detailResult[i].Regions.split(',').map(Number) as number[];
+        const rectPath = new Path2D();
         rectPath.rect(rectDim[0], rectDim[1], rectDim[2], rectDim[3]);
-        itemDetails[j] = new ItemDetails(detailResult[i].dataId, rectPath, rectDim, detailResult[i].ColorCode, false);
+        itemDetails[j] = new ItemDetails(detailResult[i].dataId, detailResult[i].Zindex, rectPath, rectDim, detailResult[i].ColorCode, false);
         pathDetails.set(rectPath, new Map().set(rectDim, detailResult[i].ColorCode));
         //ctx.fillRect(rectDim[0], rectDim[1], rectDim[2], rectDim[3]);
         j++;
@@ -18983,16 +18982,16 @@ draw() {
     detailResult = JSON.parse(detailJson72);
     console.log(detailResult);
 
-    for(var i = 0; i < detailResult.length; i++) {
+    for(let i = 0; i < detailResult.length; i++) {
       if(detailResult[i].RegionType == "R") {
-        var rectangleDimStr = detailResult[i].Regions;
+        const rectangleDimStr = detailResult[i].Regions;
         if (ctx) {
           ctx.fillStyle = detailResult[i].ColorCode;
         }
-        var rectDim = detailResult[i].Regions.split(',').map(Number) as number[];
-        var rectPath = new Path2D();
+        const rectDim = detailResult[i].Regions.split(',').map(Number) as number[];
+        const rectPath = new Path2D();
         rectPath.rect(rectDim[0], rectDim[1], rectDim[2], rectDim[3]);
-        itemDetails[j] = new ItemDetails(detailResult[i].dataId, rectPath, rectDim, detailResult[i].ColorCode, false);
+        itemDetails[j] = new ItemDetails(detailResult[i].dataId, detailResult[i].Zindex, rectPath, rectDim, detailResult[i].ColorCode, false);
         pathDetails.set(rectPath, new Map().set(rectDim, detailResult[i].ColorCode));
         //ctx.fillRect(rectDim[0], rectDim[1], rectDim[2], rectDim[3]);
         j++;
@@ -19002,16 +19001,16 @@ draw() {
     detailResult = JSON.parse(detailJson73);
     console.log(detailResult);
 
-    for(var i = 0; i < detailResult.length; i++) {
+    for(let i = 0; i < detailResult.length; i++) {
       if(detailResult[i].RegionType == "R") {
-        var rectangleDimStr = detailResult[i].Regions;
+        const rectangleDimStr = detailResult[i].Regions;
         if (ctx) {
           ctx.fillStyle = detailResult[i].ColorCode;
         }
-        var rectDim = detailResult[i].Regions.split(',').map(Number) as number[];
-        var rectPath = new Path2D();
+        const rectDim = detailResult[i].Regions.split(',').map(Number) as number[];
+        const rectPath = new Path2D();
         rectPath.rect(rectDim[0], rectDim[1], rectDim[2], rectDim[3]);
-        itemDetails[j] = new ItemDetails(detailResult[i].dataId, rectPath, rectDim, detailResult[i].ColorCode, false);
+        itemDetails[j] = new ItemDetails(detailResult[i].dataId, detailResult[i].Zindex, rectPath, rectDim, detailResult[i].ColorCode, false);
         pathDetails.set(rectPath, new Map().set(rectDim, detailResult[i].ColorCode));
         //ctx.fillRect(rectDim[0], rectDim[1], rectDim[2], rectDim[3]);
         j++;
@@ -19024,10 +19023,14 @@ draw() {
 printMousePos(event: MouseEvent) {
   const canvas = document.getElementById("selection") as HTMLCanvasElement;
   const ctx = canvas.getContext("2d");
+  const canvasBoundingLeft = canvas.getBoundingClientRect().left;
+  const canvasBoundingTop = canvas.getBoundingClientRect().top;
+  console.log("canvasBoundingLeft: " + canvasBoundingLeft + " - canvasBoundingTop: " + canvasBoundingTop);
   console.log("clientX: " + event.clientX + " - clientY: " + event.clientY);
-  console.log("itemDetails[i].path: " + itemDetails[0].path);
-  for (var i = 0; i < itemDetails.length; i++) { 
-    if (ctx?.isPointInPath(itemDetails[i].path, event.clientX, event.clientY)) {
+  for (let i = 0; i < itemDetails.length; i++) { 
+    if (itemDetails[i].zIndex == 1
+    && ctx?.isPointInPath(itemDetails[i].path, event.clientX - canvasBoundingLeft, event.clientY - canvasBoundingTop) 
+    && !ctx.isPointInStroke(itemDetails[i].path, event.clientX - canvasBoundingLeft, event.clientY - canvasBoundingTop)) {
       console.log("inside path " + itemDetails[i].coordinates);
       if(itemDetails[i].state !== true) {
         ctx.fillStyle = itemDetails[i].colorcode;
@@ -19043,16 +19046,20 @@ printMousePos(event: MouseEvent) {
       }
     }
 
-    if (ctx?.isPointInPath(itemDetails[i].path, event.clientX, Number(event.clientY) - Number(300))) {
+    if (itemDetails[i].zIndex == 0
+      && ctx?.isPointInPath(itemDetails[i].path, event.clientX - canvasBoundingLeft, event.clientY - canvasBoundingTop - 300)
+    && !ctx?.isPointInStroke(itemDetails[i].path, event.clientX - canvasBoundingLeft, event.clientY - canvasBoundingTop - 300)) {
       console.log("inside path " + itemDetails[i].coordinates);
       ctx.fillStyle = itemDetails[i].colorcode;
       ctx.fillRect(itemDetails[i].coordinates[0], itemDetails[i].coordinates[1] + 300, 
         itemDetails[i].coordinates[2], itemDetails[i].coordinates[3]);
-      itemDetails[i].state = true;  
+      itemDetails[i].state = true;
       break;
     }
 
-    if (ctx?.isPointInPath(itemDetails[i].path, event.clientX, Number(event.clientY) - Number(600))) {
+    if (itemDetails[i].zIndex == -1
+      && ctx?.isPointInPath(itemDetails[i].path, event.clientX - canvasBoundingLeft, event.clientY - canvasBoundingTop - 600)
+    && !ctx?.isPointInStroke(itemDetails[i].path, event.clientX - canvasBoundingLeft, event.clientY - canvasBoundingTop - 600)) {
       console.log("inside path " + itemDetails[i].coordinates);
       ctx.fillStyle = itemDetails[i].colorcode;
       ctx.fillRect(itemDetails[i].coordinates[0], itemDetails[i].coordinates[1] + 600, 
@@ -19068,7 +19075,7 @@ mouseMove(event: MouseEvent){
   const ctx = canvas?.getContext("2d");
   console.log("clientX: " + event.clientX + " - clientY: " +  event.clientY);
 
-  for (var i = 0; i < itemDetails.length; i++) { 
+  for (let i = 0; i < itemDetails.length; i++) { 
     if(ctx?.isPointInPath(itemDetails[i].path, event.clientX, event.clientY)) {
         if(itemDetails[i].state != true) {
           ctx.fillStyle = "rgba(228, 4, 41, 0.2)";

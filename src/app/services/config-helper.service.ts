@@ -6,5 +6,7 @@ import { Injectable } from '@angular/core';
 export class ConfigHelperService {
   diagramHeaders: any;
   diagramDetails: any[] = [];
-  constructor() { }
+  constructor() { 
+    //no-op 
+  }
 }
