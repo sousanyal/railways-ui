@@ -12,7 +12,9 @@
     </style>
   </head>
   <body>
-    <canvas id="selection"></canvas>
+    <canvas id="coachcanvas"></canvas>
     <script src="./index.ts" type="module"></script>
+    <input type="file" multiple="true" (change)="onChange($event)">
+    <input type="button" value="Save" (click)="saveCanvasPDF()"/>
   </body>
 </html>
