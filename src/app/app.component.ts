@@ -2,22 +2,43 @@ import { Component, Renderer2 } from '@angular/core';
 import html2canvas from 'html2canvas';
 import jspdf from 'jspdf';
 import { DomSanitizer } from '@angular/platform-browser';
-import {saveAs as importedSaveAs} from "file-saver";
+import { saveAs as importedSaveAs } from "file-saver";
 
 class ItemDetails {
-  dataId: number;
-  zIndex: number;
-  path: Path2D; // Add the 'path' property
-  coordinates: number[]; // Add the 'coordinates' property
-  colorcode: string;
-  state: boolean;
-  constructor(dataId: number, zIndex: number, path: Path2D, coordinates: any[], colorcode: string, state: boolean) {
-    this.dataId = dataId;
-    this.zIndex = zIndex;
-    this.path = path;
-    this.coordinates = coordinates;
-    this.colorcode = colorcode;
-    this.state = state;
+  DataId: number;
+  DiagramId: number;
+  TypeId: number;
+  Regions: string;
+  RegionType: string;
+  Zindex: number;
+  Coordinates: number[]; // Add the 'coordinates' property
+  ColorCode: string;
+  UnitLength: number;
+  Path: Path2D;
+  State: boolean;
+  constructor(dataId: number,
+    diagramId: number,
+    typeId: number,
+    regions: string,
+    regionType: string,
+    zIndex: number,
+    colorcode: string,
+    unitLength: number,
+    state: boolean) {
+    this.DataId = dataId;
+    this.DiagramId = diagramId;
+    this.TypeId = typeId;
+    this.Regions = regions;
+    this.RegionType = regionType;
+    this.Zindex = zIndex;
+    this.ColorCode = colorcode;
+    this.UnitLength = unitLength;
+    this.State = state;
+
+    this.Coordinates = regions.split(',').map(Number) as number[];
+    const path = new Path2D();
+    path.rect(this.Coordinates[0], this.Coordinates[1], this.Coordinates[2], this.Coordinates[3]);
+    this.Path = path;
   }
 }
 
@@ -56,10 +77,15 @@ export class AppComponent {
           if (ctx) {
             ctx.fillStyle = detailResult[i].ColorCode;
           }
-          const rectDim: number[] = detailResult[i].Regions.split(',').map(Number) as number[];
-          const rectPath = new Path2D();
-          rectPath.rect(rectDim[0], rectDim[1], rectDim[2], rectDim[3]);
-          itemDetails[j] = new ItemDetails(detailResult[i].DataId, detailResult[i].Zindex, rectPath, rectDim, detailResult[i].ColorCode, false);
+          itemDetails[j] = new ItemDetails(detailResult[i].DataId,
+            detailResult[i].DiagramId,
+            detailResult[i].TypeId,
+            detailResult[i].Regions,
+            detailResult[i].RegionType,
+            detailResult[i].Zindex,
+            detailResult[i].ColorCode,
+            detailResult[i].UnitLength,
+            detailResult[i].State);
           j++;
         }
       }
@@ -110,27 +136,27 @@ export class AppComponent {
       }
 
       for (let i = 0; i < itemDetails.length; i++) {
-        if (itemDetails[i].zIndex == 1 && itemDetails[i].state === true) {
+        if (itemDetails[i].Zindex == 1 && itemDetails[i].State === true) {
           if (ctx) {
-            ctx.fillStyle = itemDetails[i].colorcode;
-            ctx.fillRect(itemDetails[i].coordinates[0], itemDetails[i].coordinates[1],
-              itemDetails[i].coordinates[2], itemDetails[i].coordinates[3]);
+            ctx.fillStyle = itemDetails[i].ColorCode;
+            ctx.fillRect(itemDetails[i].Coordinates[0], itemDetails[i].Coordinates[1],
+              itemDetails[i].Coordinates[2], itemDetails[i].Coordinates[3]);
           }
         }
 
-        if (itemDetails[i].zIndex == 0 && itemDetails[i].state === true) {
+        if (itemDetails[i].Zindex == 0 && itemDetails[i].State === true) {
           if (ctx) {
-            ctx.fillStyle = itemDetails[i].colorcode;
-            ctx?.fillRect(itemDetails[i].coordinates[0], itemDetails[i].coordinates[1] + 300,
-              itemDetails[i].coordinates[2], itemDetails[i].coordinates[3]);
+            ctx.fillStyle = itemDetails[i].ColorCode;
+            ctx?.fillRect(itemDetails[i].Coordinates[0], itemDetails[i].Coordinates[1] + 300,
+              itemDetails[i].Coordinates[2], itemDetails[i].Coordinates[3]);
           }
         }
 
-        if (itemDetails[i].zIndex == -1 && itemDetails[i].state === true) {
+        if (itemDetails[i].Zindex == -1 && itemDetails[i].State === true) {
           if (ctx) {
-            ctx.fillStyle = itemDetails[i].colorcode;
-            ctx?.fillRect(itemDetails[i].coordinates[0], itemDetails[i].coordinates[1] + 600,
-              itemDetails[i].coordinates[2], itemDetails[i].coordinates[3]);
+            ctx.fillStyle = itemDetails[i].ColorCode;
+            ctx?.fillRect(itemDetails[i].Coordinates[0], itemDetails[i].Coordinates[1] + 600,
+              itemDetails[i].Coordinates[2], itemDetails[i].Coordinates[3]);
           }
         }
       }
@@ -145,56 +171,56 @@ export class AppComponent {
     console.log("canvasBoundingLeft: " + canvasBoundingLeft + " - canvasBoundingTop: " + canvasBoundingTop);
     console.log("clientX: " + event.clientX + " - clientY: " + event.clientY);
     for (let i = 0; i < itemDetails.length; i++) {
-      if (itemDetails[i].zIndex == 1
-        && ctx?.isPointInPath(itemDetails[i].path, event.clientX - canvasBoundingLeft, event.clientY - canvasBoundingTop)
-        && !ctx.isPointInStroke(itemDetails[i].path, event.clientX - canvasBoundingLeft, event.clientY - canvasBoundingTop)) {
-        console.log("inside path " + itemDetails[i].coordinates);
-        if (itemDetails[i].state !== true) {
-          ctx.fillStyle = itemDetails[i].colorcode;
-          ctx?.fillRect(itemDetails[i].coordinates[0], itemDetails[i].coordinates[1],
-            itemDetails[i].coordinates[2], itemDetails[i].coordinates[3]);
-          itemDetails[i].state = true;
+      if (itemDetails[i].Zindex == 1
+        && ctx?.isPointInPath(itemDetails[i].Path, event.clientX - canvasBoundingLeft, event.clientY - canvasBoundingTop)
+        && !ctx.isPointInStroke(itemDetails[i].Path, event.clientX - canvasBoundingLeft, event.clientY - canvasBoundingTop)) {
+        console.log("inside path " + itemDetails[i].Coordinates);
+        if (itemDetails[i].State !== true) {
+          ctx.fillStyle = itemDetails[i].ColorCode;
+          ctx?.fillRect(itemDetails[i].Coordinates[0], itemDetails[i].Coordinates[1],
+            itemDetails[i].Coordinates[2], itemDetails[i].Coordinates[3]);
+          itemDetails[i].State = true;
           break;
         } else {
-          ctx?.clearRect(itemDetails[i].coordinates[0], itemDetails[i].coordinates[1],
-            itemDetails[i].coordinates[2], itemDetails[i].coordinates[3]);
-          itemDetails[i].state = false;
+          ctx?.clearRect(itemDetails[i].Coordinates[0], itemDetails[i].Coordinates[1],
+            itemDetails[i].Coordinates[2], itemDetails[i].Coordinates[3]);
+          itemDetails[i].State = false;
           this.draw();
         }
       }
 
-      if (itemDetails[i].zIndex == 0
-        && ctx?.isPointInPath(itemDetails[i].path, event.clientX - canvasBoundingLeft, event.clientY - canvasBoundingTop - 300)
-        && !ctx?.isPointInStroke(itemDetails[i].path, event.clientX - canvasBoundingLeft, event.clientY - canvasBoundingTop - 300)) {
-        console.log("inside path " + itemDetails[i].coordinates);
-        if (itemDetails[i].state !== true) {
-          ctx.fillStyle = itemDetails[i].colorcode;
-          ctx?.fillRect(itemDetails[i].coordinates[0], itemDetails[i].coordinates[1] + 300,
-            itemDetails[i].coordinates[2], itemDetails[i].coordinates[3]);
-          itemDetails[i].state = true;
+      if (itemDetails[i].Zindex == 0
+        && ctx?.isPointInPath(itemDetails[i].Path, event.clientX - canvasBoundingLeft, event.clientY - canvasBoundingTop - 300)
+        && !ctx?.isPointInStroke(itemDetails[i].Path, event.clientX - canvasBoundingLeft, event.clientY - canvasBoundingTop - 300)) {
+        console.log("inside path " + itemDetails[i].Coordinates);
+        if (itemDetails[i].State !== true) {
+          ctx.fillStyle = itemDetails[i].ColorCode;
+          ctx?.fillRect(itemDetails[i].Coordinates[0], itemDetails[i].Coordinates[1] + 300,
+            itemDetails[i].Coordinates[2], itemDetails[i].Coordinates[3]);
+          itemDetails[i].State = true;
           break;
         } else {
-          ctx?.clearRect(itemDetails[i].coordinates[0], itemDetails[i].coordinates[1] + 300,
-            itemDetails[i].coordinates[2], itemDetails[i].coordinates[3]);
-          itemDetails[i].state = false;
+          ctx?.clearRect(itemDetails[i].Coordinates[0], itemDetails[i].Coordinates[1] + 300,
+            itemDetails[i].Coordinates[2], itemDetails[i].Coordinates[3]);
+          itemDetails[i].State = false;
           this.draw();
         }
       }
 
-      if (itemDetails[i].zIndex == -1
-        && ctx?.isPointInPath(itemDetails[i].path, event.clientX - canvasBoundingLeft, event.clientY - canvasBoundingTop - 600)
-        && !ctx?.isPointInStroke(itemDetails[i].path, event.clientX - canvasBoundingLeft, event.clientY - canvasBoundingTop - 600)) {
-        console.log("inside path " + itemDetails[i].coordinates);
-        if (itemDetails[i].state !== true) {
-          ctx.fillStyle = itemDetails[i].colorcode;
-          ctx?.fillRect(itemDetails[i].coordinates[0], itemDetails[i].coordinates[1] + 600,
-            itemDetails[i].coordinates[2], itemDetails[i].coordinates[3]);
-          itemDetails[i].state = true;
+      if (itemDetails[i].Zindex == -1
+        && ctx?.isPointInPath(itemDetails[i].Path, event.clientX - canvasBoundingLeft, event.clientY - canvasBoundingTop - 600)
+        && !ctx?.isPointInStroke(itemDetails[i].Path, event.clientX - canvasBoundingLeft, event.clientY - canvasBoundingTop - 600)) {
+        console.log("inside path " + itemDetails[i].Coordinates);
+        if (itemDetails[i].State !== true) {
+          ctx.fillStyle = itemDetails[i].ColorCode;
+          ctx?.fillRect(itemDetails[i].Coordinates[0], itemDetails[i].Coordinates[1] + 600,
+            itemDetails[i].Coordinates[2], itemDetails[i].Coordinates[3]);
+          itemDetails[i].State = true;
           break;
         } else {
-          ctx?.clearRect(itemDetails[i].coordinates[0], itemDetails[i].coordinates[1] + 600,
-            itemDetails[i].coordinates[2], itemDetails[i].coordinates[3]);
-          itemDetails[i].state = false;
+          ctx?.clearRect(itemDetails[i].Coordinates[0], itemDetails[i].Coordinates[1] + 600,
+            itemDetails[i].Coordinates[2], itemDetails[i].Coordinates[3]);
+          itemDetails[i].State = false;
           this.draw();
         }
       }
@@ -207,53 +233,53 @@ export class AppComponent {
     console.log("clientX: " + event.clientX + " - clientY: " + event.clientY);
 
     for (let i = 0; i < itemDetails.length; i++) {
-      if (ctx?.isPointInPath(itemDetails[i].path, event.clientX, event.clientY)) {
-        if (itemDetails[i].state != true) {
+      if (ctx?.isPointInPath(itemDetails[i].Path, event.clientX, event.clientY)) {
+        if (itemDetails[i].State != true) {
           ctx.fillStyle = "rgba(228, 4, 41, 0.2)";
-          ctx.fillRect(itemDetails[i].coordinates[0] + 1, itemDetails[i].coordinates[1] + 1,
-            itemDetails[i].coordinates[2] - 5, itemDetails[i].coordinates[3] - 5);
+          ctx.fillRect(itemDetails[i].Coordinates[0] + 1, itemDetails[i].Coordinates[1] + 1,
+            itemDetails[i].Coordinates[2] - 5, itemDetails[i].Coordinates[3] - 5);
         }
         break;
       }
       else {
-        if (ctx && itemDetails[i].state != true) {
-          ctx.clearRect(itemDetails[i].coordinates[0] + 1, itemDetails[i].coordinates[1] + 1,
-            itemDetails[i].coordinates[2] - 5, itemDetails[i].coordinates[3] - 5);
-          ctx.fillStyle = itemDetails[i].colorcode;
+        if (ctx && itemDetails[i].State != true) {
+          ctx.clearRect(itemDetails[i].Coordinates[0] + 1, itemDetails[i].Coordinates[1] + 1,
+            itemDetails[i].Coordinates[2] - 5, itemDetails[i].Coordinates[3] - 5);
+          ctx.fillStyle = itemDetails[i].ColorCode;
           // ctx.strokeRect(itemDetails[i].coordinates[0], itemDetails[i].coordinates[1], 
           //   itemDetails[i].coordinates[2], itemDetails[i].coordinates[3]);
         }
       }
 
       if (ctx) {
-        if (ctx.isPointInPath(itemDetails[i].path, event.clientX, Number(event.clientY) - Number(300))) {
-          if ((itemDetails[i] as ItemDetails).state != true) {
+        if (ctx.isPointInPath(itemDetails[i].Path, event.clientX, Number(event.clientY) - Number(300))) {
+          if ((itemDetails[i] as ItemDetails).State != true) {
             ctx.fillStyle = "rgba(228, 4, 41, 0.2)";
-            ctx.fillRect(itemDetails[i].coordinates[0] + 1, itemDetails[i].coordinates[1] + 300 + 1,
-              itemDetails[i].coordinates[2] - 5, itemDetails[i].coordinates[3] - 5);
+            ctx.fillRect(itemDetails[i].Coordinates[0] + 1, itemDetails[i].Coordinates[1] + 300 + 1,
+              itemDetails[i].Coordinates[2] - 5, itemDetails[i].Coordinates[3] - 5);
           }
           break;
         } else {
-          ctx.clearRect(itemDetails[i].coordinates[0] + 1, itemDetails[i].coordinates[1] + 300 + 1,
-            itemDetails[i].coordinates[2] - 5, itemDetails[i].coordinates[3] - 5);
-          ctx.fillStyle = (itemDetails[i] as ItemDetails).colorcode;
+          ctx.clearRect(itemDetails[i].Coordinates[0] + 1, itemDetails[i].Coordinates[1] + 300 + 1,
+            itemDetails[i].Coordinates[2] - 5, itemDetails[i].Coordinates[3] - 5);
+          ctx.fillStyle = (itemDetails[i] as ItemDetails).ColorCode;
           // ctx.strokeRect(itemDetails[i].coordinates[0], Number(itemDetails[i].coordinates[1]) + Number(300),
           //   itemDetails[i].coordinates[2], itemDetails[i].coordinates[3]);
         }
       }
 
       if (ctx) {
-        if (ctx.isPointInPath((itemDetails[i] as ItemDetails).path, event.clientX, Number(event.clientY) - Number(600))) {
-          if ((itemDetails[i] as ItemDetails).state != true) {
+        if (ctx.isPointInPath((itemDetails[i] as ItemDetails).Path, event.clientX, Number(event.clientY) - Number(600))) {
+          if ((itemDetails[i] as ItemDetails).State != true) {
             ctx.fillStyle = "rgba(228, 4, 41, 0.2)";
-            ctx.fillRect(itemDetails[i].coordinates[0] + 1, itemDetails[i].coordinates[1] + 600 + 1,
-              itemDetails[i].coordinates[2] - 5, itemDetails[i].coordinates[3] - 5);
+            ctx.fillRect(itemDetails[i].Coordinates[0] + 1, itemDetails[i].Coordinates[1] + 600 + 1,
+              itemDetails[i].Coordinates[2] - 5, itemDetails[i].Coordinates[3] - 5);
           }
           break;
         } else {
-          ctx.clearRect(itemDetails[i].coordinates[0] + 1, itemDetails[i].coordinates[1] + 600 + 1,
-            itemDetails[i].coordinates[2] - 5, itemDetails[i].coordinates[3] - 5);
-          ctx.fillStyle = itemDetails[i].colorcode;
+          ctx.clearRect(itemDetails[i].Coordinates[0] + 1, itemDetails[i].Coordinates[1] + 600 + 1,
+            itemDetails[i].Coordinates[2] - 5, itemDetails[i].Coordinates[3] - 5);
+          ctx.fillStyle = itemDetails[i].ColorCode;
           // ctx.strokeRect(itemDetails[i].coordinates[0], Number(itemDetails[i].coordinates[1]) + Number(600),
           //   itemDetails[i].coordinates[2], itemDetails[i].coordinates[3]);
         }
@@ -283,6 +309,7 @@ export class AppComponent {
             console.log("detail file found - " + file.name);
             this.detailJson[detailJsonIndex++] = fileReader.result as string;
             this.loadDiagramDetails();
+            this.draw();
           }
           fileReader.readAsText(file);
         }
@@ -310,7 +337,8 @@ export class AppComponent {
   private saveSelectedItemsJson() {
     console.log("savePoints");
     console.log(itemDetails);
-    const jsonData = JSON.stringify(itemDetails.filter(x => x.state === true));
+    //const jsonData = JSON.stringify(itemDetails.filter(x => x.state === true));
+    const jsonData = JSON.stringify(itemDetails);
     const blob = new Blob([jsonData], {
       type: 'application/json'
     });
