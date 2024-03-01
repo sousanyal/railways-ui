@@ -342,6 +342,6 @@ export class AppComponent {
     const blob = new Blob([jsonData], {
       type: 'application/json'
     });
-    importedSaveAs(blob, "coach-config.json");
+    importedSaveAs(blob, "coach-config-Details.json");
   }
 }
