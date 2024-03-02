@@ -62,6 +62,7 @@ export class AppComponent {
     this.loadDiagramDetails();
     window.addEventListener("load", this.draw);
     this.renderer2.listen("document", "click", event => this.printMousePos(event));
+    this.renderer2.listen("document", "mousemove", event => this.mouseMove(event));
   }
 
   loadDiagramDetails() {
@@ -103,7 +104,7 @@ export class AppComponent {
       (canvas as HTMLCanvasElement).height = window.innerHeight;
     }
 
-    if ((canvas as HTMLCanvasElement).getContext) {
+    if (this.headerJson !== "" && (canvas as HTMLCanvasElement).getContext) {
       const headerResult = JSON.parse(this.headerJson);
       const ctx = (canvas as HTMLCanvasElement)?.getContext("2d");
       let yOffset = 0;
@@ -230,63 +231,44 @@ export class AppComponent {
   mouseMove(event: MouseEvent) {
     const canvas = document.getElementById("coachcanvas") as HTMLCanvasElement;
     const ctx = canvas?.getContext("2d");
+    const canvasBoundingLeft = canvas.getBoundingClientRect().left;
+    const canvasBoundingTop = canvas.getBoundingClientRect().top;
     console.log("clientX: " + event.clientX + " - clientY: " + event.clientY);
-
+    this.draw();
     for (let i = 0; i < itemDetails.length; i++) {
-      if (ctx?.isPointInPath(itemDetails[i].Path, event.clientX, event.clientY)) {
+      if (itemDetails[i].Zindex == 1
+        && ctx?.isPointInPath(itemDetails[i].Path, event.clientX - canvasBoundingLeft, event.clientY - canvasBoundingTop)
+        && !ctx.isPointInStroke(itemDetails[i].Path, event.clientX - canvasBoundingLeft, event.clientY - canvasBoundingTop)) {
         if (itemDetails[i].State != true) {
-          ctx.fillStyle = "rgba(228, 4, 41, 0.2)";
-          ctx.fillRect(itemDetails[i].Coordinates[0] + 1, itemDetails[i].Coordinates[1] + 1,
-            itemDetails[i].Coordinates[2] - 5, itemDetails[i].Coordinates[3] - 5);
+          ctx.fillStyle = itemDetails[i].ColorCode;
+          ctx.fillRect(itemDetails[i].Coordinates[0], itemDetails[i].Coordinates[1],
+            itemDetails[i].Coordinates[2], itemDetails[i].Coordinates[3]);
         }
         break;
       }
-      else {
-        if (ctx && itemDetails[i].State != true) {
-          ctx.clearRect(itemDetails[i].Coordinates[0] + 1, itemDetails[i].Coordinates[1] + 1,
-            itemDetails[i].Coordinates[2] - 5, itemDetails[i].Coordinates[3] - 5);
+
+      if (itemDetails[i].Zindex == 0
+        && ctx?.isPointInPath(itemDetails[i].Path, event.clientX - canvasBoundingLeft, event.clientY - canvasBoundingTop - 300)
+        && !ctx.isPointInStroke(itemDetails[i].Path, event.clientX - canvasBoundingLeft, event.clientY - canvasBoundingTop - 300)) {
+        if (itemDetails[i].State != true) {
           ctx.fillStyle = itemDetails[i].ColorCode;
-          // ctx.strokeRect(itemDetails[i].coordinates[0], itemDetails[i].coordinates[1], 
-          //   itemDetails[i].coordinates[2], itemDetails[i].coordinates[3]);
+          ctx.fillRect(itemDetails[i].Coordinates[0], itemDetails[i].Coordinates[1] + 300,
+            itemDetails[i].Coordinates[2], itemDetails[i].Coordinates[3]);
         }
+        break;
       }
 
-      if (ctx) {
-        if (ctx.isPointInPath(itemDetails[i].Path, event.clientX, Number(event.clientY) - Number(300))) {
-          if ((itemDetails[i] as ItemDetails).State != true) {
-            ctx.fillStyle = "rgba(228, 4, 41, 0.2)";
-            ctx.fillRect(itemDetails[i].Coordinates[0] + 1, itemDetails[i].Coordinates[1] + 300 + 1,
-              itemDetails[i].Coordinates[2] - 5, itemDetails[i].Coordinates[3] - 5);
-          }
-          break;
-        } else {
-          ctx.clearRect(itemDetails[i].Coordinates[0] + 1, itemDetails[i].Coordinates[1] + 300 + 1,
-            itemDetails[i].Coordinates[2] - 5, itemDetails[i].Coordinates[3] - 5);
-          ctx.fillStyle = (itemDetails[i] as ItemDetails).ColorCode;
-          // ctx.strokeRect(itemDetails[i].coordinates[0], Number(itemDetails[i].coordinates[1]) + Number(300),
-          //   itemDetails[i].coordinates[2], itemDetails[i].coordinates[3]);
-        }
-      }
-
-      if (ctx) {
-        if (ctx.isPointInPath((itemDetails[i] as ItemDetails).Path, event.clientX, Number(event.clientY) - Number(600))) {
-          if ((itemDetails[i] as ItemDetails).State != true) {
-            ctx.fillStyle = "rgba(228, 4, 41, 0.2)";
-            ctx.fillRect(itemDetails[i].Coordinates[0] + 1, itemDetails[i].Coordinates[1] + 600 + 1,
-              itemDetails[i].Coordinates[2] - 5, itemDetails[i].Coordinates[3] - 5);
-          }
-          break;
-        } else {
-          ctx.clearRect(itemDetails[i].Coordinates[0] + 1, itemDetails[i].Coordinates[1] + 600 + 1,
-            itemDetails[i].Coordinates[2] - 5, itemDetails[i].Coordinates[3] - 5);
+      if (itemDetails[i].Zindex == -1
+        && ctx?.isPointInPath(itemDetails[i].Path, event.clientX - canvasBoundingLeft, event.clientY - canvasBoundingTop - 600)
+        && !ctx.isPointInStroke(itemDetails[i].Path, event.clientX - canvasBoundingLeft, event.clientY - canvasBoundingTop - 600)) {
+        if (itemDetails[i].State != true) {
           ctx.fillStyle = itemDetails[i].ColorCode;
-          // ctx.strokeRect(itemDetails[i].coordinates[0], Number(itemDetails[i].coordinates[1]) + Number(600),
-          //   itemDetails[i].coordinates[2], itemDetails[i].coordinates[3]);
+          ctx.fillRect(itemDetails[i].Coordinates[0], itemDetails[i].Coordinates[1] + 600,
+            itemDetails[i].Coordinates[2], itemDetails[i].Coordinates[3]);
         }
+        break;
       }
     }
-
-    //document.getElementById("coachcanvas").addEventListener("mousemove", mouseMove);
   }
 
   public onChange(event: Event): void {
