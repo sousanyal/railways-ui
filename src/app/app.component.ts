@@ -3,6 +3,7 @@ import html2canvas from 'html2canvas';
 import jspdf from 'jspdf';
 import { DomSanitizer } from '@angular/platform-browser';
 import { saveAs as importedSaveAs } from "file-saver";
+import { HttpService } from './services/http-service';
 
 class ItemDetails {
   DataId: number;
@@ -47,12 +48,13 @@ const itemDetails: ItemDetails[] = [];
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  styleUrls: ['./app.component.css'],
+  providers: [HttpService]
 })
 export class AppComponent {
   title = 'coach-config';
 
-  constructor(private renderer2: Renderer2, private domSanitizer: DomSanitizer) { }
+  constructor(private renderer2: Renderer2, private domSanitizer: DomSanitizer, private httpService: HttpService) { }
 
   headerJson = "";
   detailJson: string[] = [];
@@ -181,13 +183,14 @@ export class AppComponent {
           ctx?.fillRect(itemDetails[i].Coordinates[0], itemDetails[i].Coordinates[1],
             itemDetails[i].Coordinates[2], itemDetails[i].Coordinates[3]);
           itemDetails[i].State = true;
-          break;
         } else {
           ctx?.clearRect(itemDetails[i].Coordinates[0], itemDetails[i].Coordinates[1],
             itemDetails[i].Coordinates[2], itemDetails[i].Coordinates[3]);
           itemDetails[i].State = false;
           this.draw();
         }
+        this.httpService.submitItemDetails(JSON.stringify(itemDetails));
+        break;
       }
 
       if (itemDetails[i].Zindex == 0
@@ -199,13 +202,14 @@ export class AppComponent {
           ctx?.fillRect(itemDetails[i].Coordinates[0], itemDetails[i].Coordinates[1] + 300,
             itemDetails[i].Coordinates[2], itemDetails[i].Coordinates[3]);
           itemDetails[i].State = true;
-          break;
         } else {
           ctx?.clearRect(itemDetails[i].Coordinates[0], itemDetails[i].Coordinates[1] + 300,
             itemDetails[i].Coordinates[2], itemDetails[i].Coordinates[3]);
           itemDetails[i].State = false;
           this.draw();
         }
+        this.httpService.submitItemDetails(JSON.stringify(itemDetails));
+        break;
       }
 
       if (itemDetails[i].Zindex == -1
@@ -217,13 +221,14 @@ export class AppComponent {
           ctx?.fillRect(itemDetails[i].Coordinates[0], itemDetails[i].Coordinates[1] + 600,
             itemDetails[i].Coordinates[2], itemDetails[i].Coordinates[3]);
           itemDetails[i].State = true;
-          break;
         } else {
           ctx?.clearRect(itemDetails[i].Coordinates[0], itemDetails[i].Coordinates[1] + 600,
             itemDetails[i].Coordinates[2], itemDetails[i].Coordinates[3]);
           itemDetails[i].State = false;
           this.draw();
         }
+        this.httpService.submitItemDetails(JSON.stringify(itemDetails));
+        break;
       }
     }
   }
