@@ -58,13 +58,16 @@ export class AppComponent {
 
   headerJson = "";
   detailJson: string[] = [];
+  mouseDown = false;
 
   ngAfterViewInit(): void {
     console.log("ngAfterViewInit");
     this.loadDiagramDetails();
     window.addEventListener("load", this.draw);
-    this.renderer2.listen("document", "click", event => this.printMousePos(event));
+    this.renderer2.listen("document", "click", event => this.mouseClick(event));
     this.renderer2.listen("document", "mousemove", event => this.mouseMove(event));
+    document.addEventListener('mousedown', () => this.mouseDown = true);
+    document.addEventListener('mouseup', () => this.mouseDown = false);
   }
 
   loadDiagramDetails() {
@@ -115,7 +118,6 @@ export class AppComponent {
         for (let j = 0; j < lineDimStr.length; j++) {
           const lineDim = lineDimStr[j].split(',').map(Number) as number[];
           ctx?.beginPath();
-          console.log(lineDim[1] + yOffset);
           ctx?.moveTo(lineDim[0], lineDim[1] + yOffset);
           ctx?.lineTo(lineDim[2], lineDim[3] + yOffset);
           ctx?.stroke();
@@ -166,7 +168,7 @@ export class AppComponent {
     }
   }
 
-  printMousePos(event: MouseEvent) {
+  mouseClick(event: MouseEvent) {
     const canvas = document.getElementById("coachcanvas") as HTMLCanvasElement;
     const ctx = canvas.getContext("2d");
     const canvasBoundingLeft = canvas.getBoundingClientRect().left;
@@ -238,7 +240,7 @@ export class AppComponent {
     const ctx = canvas?.getContext("2d");
     const canvasBoundingLeft = canvas.getBoundingClientRect().left;
     const canvasBoundingTop = canvas.getBoundingClientRect().top;
-    console.log("clientX: " + event.clientX + " - clientY: " + event.clientY);
+    //console.log("clientX: " + event.clientX + " - clientY: " + event.clientY);
     this.draw();
     for (let i = 0; i < itemDetails.length; i++) {
       if (itemDetails[i].Zindex == 1
@@ -248,6 +250,9 @@ export class AppComponent {
           ctx.fillStyle = itemDetails[i].ColorCode;
           ctx.fillRect(itemDetails[i].Coordinates[0], itemDetails[i].Coordinates[1],
             itemDetails[i].Coordinates[2], itemDetails[i].Coordinates[3]);
+          if (this.mouseDown){
+            itemDetails[i].State = true;
+          }
         }
         break;
       }
@@ -259,6 +264,9 @@ export class AppComponent {
           ctx.fillStyle = itemDetails[i].ColorCode;
           ctx.fillRect(itemDetails[i].Coordinates[0], itemDetails[i].Coordinates[1] + 300,
             itemDetails[i].Coordinates[2], itemDetails[i].Coordinates[3]);
+          if (this.mouseDown){
+            itemDetails[i].State = true;
+          }  
         }
         break;
       }
@@ -270,6 +278,9 @@ export class AppComponent {
           ctx.fillStyle = itemDetails[i].ColorCode;
           ctx.fillRect(itemDetails[i].Coordinates[0], itemDetails[i].Coordinates[1] + 600,
             itemDetails[i].Coordinates[2], itemDetails[i].Coordinates[3]);
+          if (this.mouseDown){
+            itemDetails[i].State = true;
+          }
         }
         break;
       }
@@ -284,7 +295,7 @@ export class AppComponent {
       for (const file of Array.from(inputElement.files)) {
         if (file.name.includes("header")) {
           const fileReader: FileReader = new FileReader();
-          fileReader.onloadend = (x) => {
+          fileReader.onloadend = () => {
             console.log("header file found - " + file.name);
             this.headerJson = fileReader.result as string;
             this.draw();
@@ -292,7 +303,7 @@ export class AppComponent {
           fileReader.readAsText(file);
         } else if (file.name.includes("Detail")) {
           const fileReader: FileReader = new FileReader();
-          fileReader.onloadend = (x) => {
+          fileReader.onloadend = () => {
             console.log("detail file found - " + file.name);
             this.detailJson[detailJsonIndex++] = fileReader.result as string;
             this.loadDiagramDetails();
